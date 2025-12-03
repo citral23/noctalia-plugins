@@ -12,8 +12,8 @@ Each plugin must have the following structure:
 
 ```
 plugin-name/
-├── manifest.json       # Plugin metadata (required)
-├── Main.qml           # Main plugin entry point
+├── manifest.json      # Plugin metadata (required)
+├── Main.qml           # Main component for IPCTarget or general logic (optional)
 ├── BarWidget.qml      # Bar widget component (optional)
 ├── Panel.qml          # Panel component (optional)
 ├── Settings.qml       # Settings UI (optional)
