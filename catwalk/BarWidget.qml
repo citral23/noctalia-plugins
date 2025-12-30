@@ -72,7 +72,6 @@ Rectangle {
     readonly property real cpuUsage: root.pluginApi?.mainInstance?.cpuUsage ?? 0
     
     function openPanel() {
-        Tooltip
         if (pluginApi) {
             var result = pluginApi.openPanel(root.screen);
             Logger.i("Catwalk", "OpenPanel result:", result);
