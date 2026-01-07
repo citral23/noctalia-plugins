@@ -440,6 +440,79 @@ Item {
                           Layout.fillWidth: true
                         }
 
+                        // Edit button
+                        Item {
+                          id: editButtonContainer
+                          implicitWidth: Style.baseWidgetSize * 0.6
+                          implicitHeight: Style.baseWidgetSize * 0.6
+
+                          NIcon {
+                            id: editButtonIcon
+                            anchors.centerIn: parent
+                            icon: "pencil"
+                            pointSize: Style.fontSizeS
+                            color: Color.mOnSurfaceVariant
+                            opacity: 0.3
+
+                            MouseArea {
+                              id: editMouseArea
+                              anchors.fill: parent
+                              hoverEnabled: true
+                              cursorShape: Qt.PointingHandCursor
+                              onClicked: {
+                                // Set the current todo for editing
+                                currentTodoId = modelData.id;
+                                currentTodoText = modelData.text;
+                                editDialog.open();
+                              }
+                            }
+
+                            ToolTip {
+                              id: editToolTip
+                              text: pluginApi?.tr("panel.todo_item.edit_button_tooltip") || "Edit"
+                              delay: 1000
+                              parent: editButtonIcon
+                              visible: editMouseArea.containsMouse
+
+                              contentItem: NText {
+                                text: editToolTip.text
+                                color: Color.mOnPrimary
+                                font.pointSize: Style.fontSizeXS
+                              }
+
+                              background: Rectangle {
+                                color: Color.mPrimary
+                                radius: Style.iRadiusS
+                                border.color: Qt.rgba(0, 0, 0, 0.2)
+                                border.width: 1
+                              }
+                            }
+
+                            states: [
+                              State {
+                                name: "hovered"
+                                when: editMouseArea.containsMouse
+                                PropertyChanges {
+                                  target: editButtonIcon
+                                  opacity: 1.0
+                                  color: Color.mPrimary
+                                }
+                              }
+                            ]
+
+                            transitions: [
+                              Transition {
+                                from: "*"; to: "hovered"
+                                NumberAnimation { properties: "opacity"; duration: 150 }
+                              },
+                              Transition {
+                                from: "hovered"; to: "*"
+                                NumberAnimation { properties: "opacity"; duration: 150 }
+                              }
+                            ]
+                          }
+                        }
+
                         // Delete button
                         Item {
                           id: deleteButtonContainer
@@ -498,6 +571,27 @@ Item {
                               }
                             }
 
+                            ToolTip {
+                              id: deleteToolTip
+                              text: pluginApi?.tr("panel.todo_item.delete_button_tooltip") || "Delete"
+                              delay: 1000
+                              parent: deleteButtonIcon
+                              visible: mouseArea.containsMouse
+
+                              contentItem: NText {
+                                text: deleteToolTip.text
+                                color: Color.mOnError
+                                font.pointSize: Style.fontSizeXS
+                              }
+
+                              background: Rectangle {
+                                color: Color.mError
+                                radius: Style.iRadiusS
+                                border.color: Qt.rgba(0, 0, 0, 0.2)
+                                border.width: 1
+                              }
+                            }
+
                             states: [
                               State {
                                 name: "hovered"
@@ -549,6 +643,94 @@ Item {
           }
         }
       }
+    }
+  }
+
+  // Properties for edit dialog
+  property var currentTodoId: null
+  property string currentTodoText: ""
+
+  // Edit Dialog
+  Popup {
+    id: editDialog
+    modal: true
+    dim: true
+    anchors.centerIn: Overlay.overlay
+    width: 400 * Style.uiScaleRatio
+    height: 200 * Style.uiScaleRatio
+    padding: Style.marginL
+    background: Rectangle {
+      color: Color.mSurface
+      border.color: Color.mOutline
+      border.width: 1
+      radius: Style.radiusL
+    }
+
+    ColumnLayout {
+      anchors.fill: parent
+      spacing: Style.marginM
+
+      NText {
+        text: pluginApi?.tr("panel.edit_todo.title") || "Edit Todo"
+        font.pointSize: Style.fontSizeL
+        font.weight: Font.Bold
+        color: Color.mOnSurface
+        Layout.fillWidth: true
+        horizontalAlignment: Text.AlignHCenter
+      }
+
+      NTextInput {
+        id: editTodoInput
+        text: root.currentTodoText
+        placeholderText: pluginApi?.tr("panel.edit_todo.placeholder") || "Enter todo text"
+        Layout.fillWidth: true
+        onTextChanged: root.currentTodoText = text
+      }
+
+      RowLayout {
+        Layout.alignment: Qt.AlignHCenter
+        spacing: Style.marginM
+
+        NButton {
+          text: pluginApi?.tr("panel.edit_todo.cancel_button") || "Cancel"
+          onClicked: {
+            editDialog.close();
+          }
+        }
+
+        NButton {
+          text: pluginApi?.tr("panel.edit_todo.save_button") || "Save"
+          backgroundColor: Color.mPrimary
+          textColor: Color.mOnPrimary
+          onClicked: {
+            if (pluginApi && root.currentTodoId !== null && root.currentTodoText.trim() !== "") {
+              var todos = pluginApi.pluginSettings.todos || [];
+
+              for (var i = 0; i < todos.length; i++) {
+                if (todos[i].id === root.currentTodoId) {
+                  todos[i].text = root.currentTodoText.trim();
+                  break;
+                }
+              }
+
+              pluginApi.pluginSettings.todos = todos;
+              pluginApi.saveSettings();
+              loadTodos();
+              editDialog.close();
+            }
+          }
+        }
+      }
+    }
+
+    onOpened: {
+      editTodoInput.forceActiveFocus();
+      editTodoInput.text = root.currentTodoText;
+    }
+
+    onClosed: {
+      root.currentTodoId = null;
+      root.currentTodoText = "";
     }
   }
 
