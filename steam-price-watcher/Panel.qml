@@ -257,6 +257,30 @@ Item {
               enabled: !loading
               onClicked: refreshPrices()
             }
+
+            NIconButton {
+              icon: "settings"
+              tooltipText: pluginApi?.tr("steam-price-watcher.settings.open-settings")
+              baseSize: Style.baseWidgetSize * 0.8
+              onClicked: {
+                // Close this panel first, then open the plugin settings on the same screen
+                var screen = pluginApi?.panelOpenScreen;
+                if (screen) {
+                  pluginApi.closePanel(screen);
+                  Qt.callLater(function() {
+                    BarService.openPluginSettings(screen, pluginApi.manifest);
+                  });
+                } else if (pluginApi && pluginApi.withCurrentScreen) {
+                  // Fallback for contexts where panelOpenScreen isn't available
+                  pluginApi.withCurrentScreen(function(s) {
+                    pluginApi.closePanel(s);
+                    Qt.callLater(function() {
+                      BarService.openPluginSettings(s, pluginApi.manifest);
+                    });
+                  });
+                }
+              }
+            }
           }
         }
       }
