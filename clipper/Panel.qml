@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import Quickshell.Wayland
+import Quickshell.Io
 import QtQuick.Layouts
 import Quickshell
 import qs.Commons
@@ -13,6 +14,18 @@ Item {
 
     // Plugin API (injected by PluginPanelSlot)
     property var pluginApi: null
+
+    // Process for ToDo IPC calls
+    Process {
+        id: todoIpcProcess
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 0) {
+                ToastService.showNotice("Added to ToDo list");
+            } else {
+                Logger.e("clipper", "Failed to add to ToDo: exit code " + exitCode);
+            }
+        }
+    }
 
     // SmartPanel properties (required for panel behavior)
     readonly property var geometryPlaceholder: panelContainer
@@ -585,6 +598,7 @@ Item {
                     pluginApi: root.pluginApi
                     height: listView.height
                     selected: index === root.selectedIndex
+                    enableTodoIntegration: root.pluginApi?.pluginSettings?.enableTodoIntegration || false
 
                     onClicked: {
                         root.selectedIndex = index;
@@ -596,6 +610,14 @@ Item {
 
                     onDeleteClicked: {
                         ClipboardService.deleteById(clipboardId);
+                    }
+
+                    onAddToTodoClicked: {
+                        if (preview) {
+                            // Call Clipper IPC to add item to ToDo (page 0)
+                            todoIpcProcess.command = ["qs", "-p", Quickshell.shellDir, "ipc", "call", "plugin:clipper", "addTextToTodo", preview.substring(0, 200), "0"];
+                            todoIpcProcess.running = true;
+                        }
                     }
                 }
 

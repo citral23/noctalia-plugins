@@ -86,7 +86,9 @@ Rectangle {
 
     signal clicked
     signal deleteClicked
+    signal addToTodoClicked
     property bool selected: false
+    property bool enableTodoIntegration: false
 
     width: 250
     height: parent.height
@@ -128,7 +130,19 @@ Rectangle {
                 NText { text: root.typeLabel; color: root.accentFgColor; font.bold: true }
                 Item { Layout.fillWidth: true }
                 NIconButton {
+                    visible: root.enableTodoIntegration && !root.isImage
+                    icon: "checkbox"
+                    tooltipText: "Add to ToDo"
+                    colorFg: root.accentFgColor
+                    colorBg: "transparent"
+                    colorBgHover: Qt.rgba(0,0,0,0.1)
+                    colorBorder: "transparent"
+                    colorBorderHover: "transparent"
+                    onClicked: root.addToTodoClicked()
+                }
+                NIconButton {
                     icon: "trash"
+                    tooltipText: "Delete"
                     colorFg: root.accentFgColor
                     colorBg: "transparent"
                     colorBgHover: Qt.rgba(0,0,0,0.1)
@@ -170,13 +184,15 @@ Rectangle {
 
             NText {
                 visible: !root.isColor && !root.isImage
-                anchors.fill: parent
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
                 text: root.preview || ""
                 wrapMode: Text.Wrap
                 elide: Text.ElideRight
-                color: root.accentFgColor // Text matches header text
+                color: root.accentFgColor
                 font.pointSize: 11
-                anchors.topMargin: -50 // Adjusted to position text higher
+                verticalAlignment: Text.AlignTop
             }
 
             NImageRounded {
