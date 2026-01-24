@@ -160,27 +160,6 @@ Item {
 
   readonly property bool panelReady: pluginApi !== null && mainInstance !== null && mainInstance !== undefined
 
-  // Check if Taildrop plugin is available
-  // We check if the IPC call succeeds (exit code 0) which means the plugin is loaded
-  property bool taildropAvailable: false
-  
-  Process {
-    id: taildropCheckProcess
-    command: ["noctalia-shell", "ipc", "call", "plugin:taildrop", "info"]
-    running: false
-    
-    onExited: function(exitCode) {
-      // If IPC call succeeds, taildrop is available
-      root.taildropAvailable = (exitCode === 0)
-    }
-  }
-  
-  onPanelReadyChanged: {
-    if (panelReady) {
-      taildropCheckProcess.running = true
-    }
-  }
-
   readonly property bool hideDisconnected:
     pluginApi?.pluginSettings?.hideDisconnected ??
     pluginApi?.manifest?.metadata?.defaultSettings?.hideDisconnected ??
@@ -503,16 +482,6 @@ Item {
               }
             }
           }
-        }
-      }
-
-      NButton {
-        Layout.fillWidth: true
-        visible: root.taildropAvailable && (mainInstance?.tailscaleRunning ?? false)
-        text: pluginApi?.tr("panel.send-files") || "Send Files"
-        icon: "send"
-        onClicked: {
-          Quickshell.execDetached(["noctalia-shell", "ipc", "call", "plugin:taildrop", "open"])
         }
       }
 
