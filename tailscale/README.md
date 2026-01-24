@@ -30,6 +30,7 @@ A Tailscale status plugin for Noctalia that shows your Tailscale connection stat
 | `hideDisconnected` | false | Hide the widget when Tailscale is disconnected |
 | `terminalCommand` | "" | Terminal command prefix for SSH (e.g., `wezterm start --` or `ghostty`) |
 | `pingCount` | 5 | Number of pings to send when pinging a peer |
+| `defaultPeerAction` | "copy-ip" | Action when clicking a peer: `copy-ip`, `ssh`, or `ping` |
 
 ## IPC Commands
 

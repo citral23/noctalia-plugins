@@ -29,7 +29,8 @@
       "showPeerCount": true,
       "hideDisconnected": false,
       "terminalCommand": "",
-      "pingCount": 5
+      "pingCount": 5,
+      "defaultPeerAction": "copy-ip"
     }
   }
 }

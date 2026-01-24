@@ -17,7 +17,10 @@
     "terminal-command": "Commande du terminal",
     "terminal-command-desc": "Commande pour lancer le terminal pour SSH/ping (ex : 'ghostty', 'alacritty', 'kitty')",
     "ping-count": "Nombre de pings",
-    "ping-count-desc": "Nombre de paquets ping à envoyer lors du test de connectivité"
+    "ping-count-desc": "Nombre de paquets ping à envoyer lors du test de connectivité",
+    "peer-action": "Action au clic sur un pair",
+    "default-peer-action": "Action par défaut",
+    "default-peer-action-desc": "Action lors du clic sur un pair dans le panneau"
   },
   "actions": {
     "widget-settings": "Paramètres du widget"

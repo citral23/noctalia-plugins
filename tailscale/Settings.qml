@@ -45,6 +45,11 @@ ColumnLayout {
     pluginApi?.manifest?.metadata?.defaultSettings?.pingCount ||
     5
 
+  property string editDefaultPeerAction:
+    pluginApi?.pluginSettings?.defaultPeerAction ||
+    pluginApi?.manifest?.metadata?.defaultSettings?.defaultPeerAction ||
+    "copy-ip"
+
   spacing: Style.marginM
 
   // Title section
@@ -181,6 +186,32 @@ ColumnLayout {
     onValueChanged: root.editPingCount = value
   }
 
+  // Peer action section
+  NDivider {
+    Layout.fillWidth: true
+    Layout.topMargin: Style.marginM
+    Layout.bottomMargin: Style.marginM
+  }
+
+  NLabel {
+    label: pluginApi?.tr("settings.peer-action") || "Peer Click Action"
+  }
+
+  NComboBox {
+    Layout.fillWidth: true
+    label: pluginApi?.tr("settings.default-peer-action") || "Default Action"
+    description: pluginApi?.tr("settings.default-peer-action-desc") || "Action when clicking on a peer in the panel"
+
+    model: [
+      { key: "copy-ip", name: pluginApi?.tr("context.copy-ip") || "Copy IP" },
+      { key: "ssh", name: pluginApi?.tr("context.ssh") || "SSH to host" },
+      { key: "ping", name: pluginApi?.tr("context.ping") || "Ping host" }
+    ]
+
+    currentKey: root.editDefaultPeerAction
+    onSelected: key => root.editDefaultPeerAction = key
+  }
+
   // Save function - called by the dialog
   function saveSettings() {
     if (!pluginApi) {
@@ -195,6 +226,7 @@ ColumnLayout {
     pluginApi.pluginSettings.hideDisconnected = root.editHideDisconnected
     pluginApi.pluginSettings.terminalCommand = root.editTerminalCommand
     pluginApi.pluginSettings.pingCount = root.editPingCount
+    pluginApi.pluginSettings.defaultPeerAction = root.editDefaultPeerAction
 
     pluginApi.saveSettings()
 

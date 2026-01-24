@@ -17,7 +17,10 @@
     "terminal-command": "Terminalkommando",
     "terminal-command-desc": "Kommando för att starta terminal för SSH/ping (t.ex. 'ghostty', 'alacritty', 'kitty')",
     "ping-count": "Antal pingar",
-    "ping-count-desc": "Antal ping-paket att skicka vid anslutningstest"
+    "ping-count-desc": "Antal ping-paket att skicka vid anslutningstest",
+    "peer-action": "Peer-klickåtgärd",
+    "default-peer-action": "Standardåtgärd",
+    "default-peer-action-desc": "Åtgärd vid klick på en peer i panelen"
   },
   "actions": {
     "widget-settings": "Widgetinställningar"

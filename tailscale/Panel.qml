@@ -80,6 +80,21 @@ Item {
     }
   }
 
+  function executePeerAction(action, peer) {
+    selectedPeer = peer
+    switch (action) {
+      case "copy-ip":
+        copySelectedPeerIp()
+        break
+      case "ssh":
+        sshToSelectedPeer()
+        break
+      case "ping":
+        pingSelectedPeer()
+        break
+    }
+  }
+
   NContextMenu {
     id: peerContextMenu
     model: [
@@ -138,6 +153,11 @@ Item {
     pluginApi?.pluginSettings?.pingCount ||
     pluginApi?.manifest?.metadata?.defaultSettings?.pingCount ||
     5
+
+  readonly property string defaultPeerAction:
+    pluginApi?.pluginSettings?.defaultPeerAction ||
+    pluginApi?.manifest?.metadata?.defaultSettings?.defaultPeerAction ||
+    "copy-ip"
 
   readonly property bool isTerminalConfigured: terminalCommand.trim() !== ""
 
@@ -418,12 +438,7 @@ Item {
 
                   onClicked: {
                     if (peerDelegate.peerIp) {
-                      root.copyToClipboard(peerDelegate.peerIp)
-                      ToastService.showNotice(
-                        pluginApi?.tr("toast.ip-copied.title") || "IP Copied",
-                        peerDelegate.peerIp,
-                        "clipboard"
-                      )
+                      root.executePeerAction(root.defaultPeerAction, peerDelegate.peerData)
                     }
                   }
 
