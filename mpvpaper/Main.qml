@@ -1,0 +1,110 @@
+pragma ComponentBehavior: Bound
+import Qt.labs.folderlistmodel
+import QtQuick
+import Quickshell
+import Quickshell.Io
+
+import qs.Commons
+import qs.Services.UI
+
+Item {
+    id: root
+    property var pluginApi: null
+
+    readonly property bool active: 
+        pluginApi.pluginSettings.active || 
+        false
+
+    readonly property string wallpapersFolder: 
+        pluginApi.pluginSettings.wallpapersFolder || 
+        pluginApi.manifest.metadata.defaultSettings.wallpapersFolder || 
+        "~/Pictures/Wallpapers"
+
+    readonly property string currentWallpaper: 
+        pluginApi.pluginSettings.currentWallpaper || 
+        ""
+
+    readonly property string mpvSocket: 
+        pluginApi.pluginSettings.mpvSocket || 
+        pluginApi.manifest.metadata.defaultSettings.mpvSocket || 
+        "/tmp/mpv-socket"
+
+    function random() {
+        if (wallpapersFolder === "" || folderModel.count === 0) {
+            Logger.e("mpvpaper", "Empty wallpapers folder or no files found!");
+            return;
+        }
+
+        const rand = Math.floor(Math.random() * folderModel.count);
+        const url = folderModel.get(rand, "fileUrl");
+        setWallpaper(url);
+    }
+
+    function setWallpaper(path) {
+        if (root.pluginApi == null) {
+            Logger.e("mpvpaper", "Can't set the wallpaper because pluginApi is null.");
+            return;
+        }
+
+        pluginApi.pluginSettings.currentWallpaper = path;
+        pluginApi.saveSettings();
+    }
+
+    function clear() {
+        setWallpaper("");
+    }
+
+    onCurrentWallpaperChanged: {
+        if (root.currentWallpaper != "") {
+            Logger.d("mpvpaper", "Changing current wallpaper:", root.currentWallpaper);
+
+            if(mpvProc.running) {
+                // If mpvpaper is already running
+                socket.connected = true;
+                socket.path = mpvSocket;
+                socket.write(`loadfile "${root.currentWallpaper}"\n`);
+                socket.flush();
+            } else {
+                // Start mpvpaper
+                mpvProc.command = ["sh", "-c", `mpvpaper -o "input-ipc-server=${root.mpvSocket} loop no-audio" ALL ${root.currentWallpaper}` ]
+                mpvProc.running = true;
+            }
+        } else if(mpvProc.running) {
+            socket.connected = false;
+            mpvProc.running = false;
+        }
+    }
+
+    FolderListModel {
+        id: folderModel
+        folder: "file://" + root.wallpapersFolder
+        nameFilters: ["*.mp4", "*.avi", "*.mov"]
+        showDirs: false
+    }
+
+    Process {
+        id: mpvProc
+    }
+
+    Socket {
+        id: socket
+        path: root.mpvSocket
+    }
+
+    // IPC Handler
+    IpcHandler {
+        target: "plugin:mpvpaper"
+
+        function random() {
+            root.random();
+        }
+
+        function setWallpaper(path: string) {
+            root.setWallpaper(path);
+        }
+
+        function clear() {
+            root.clear();
+        }
+    }
+}

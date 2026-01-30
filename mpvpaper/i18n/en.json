@@ -1,0 +1,31 @@
+{
+  "settings": {
+    "toggle": {
+      "label": "Enable mpvpaper",
+      "description": "Enable the mpvpaper integration"
+    },
+    "wallpapers_folder": {
+      "title_label": "Wallpapers Folder",
+      "title_description": "The folder that contains all the wallpapers, useful when using random wallpaper",
+      "input_placeholder": "/path/to/folder/with/wallpapers",
+      "icon_tooltip": "Select wallpapers folder",
+      "file_picker_title": "Choose wallpapers folder"
+    },
+    "current_wallpaper": {
+      "title_label": "Current Wallpaper",
+      "title_description": "The current wallpaper that is shown.",
+      "input_placeholder": "/path/to/wallpaper",
+      "icon_tooltip": "Select current wallpaper",
+      "file_picker_title": "Choose current wallpaper"
+    },
+    "mpv_socket": {
+      "title_label": "Mpvpaper socket",
+      "title_description": "The mpvpaper socket that noctalia connects to",
+      "input_placeholder": "Example: /tmp/mpv-socket"
+    },
+    "actions": {
+      "random": "Random",
+      "clear": "Clear"
+    }
+  }
+}
