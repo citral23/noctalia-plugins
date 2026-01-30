@@ -20,7 +20,7 @@
       "showTempValue": true,
       "showTempUnit": true,
       "showConditionIcon": true,
-      "tooltipOption": 0
+      "tooltipOption": 3
     }
   }
 }
