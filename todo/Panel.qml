@@ -414,6 +414,15 @@ Item {
                   color: Color.mSurface
                   radius: Style.radiusS
 
+                  // Mouse area for clicking the entire item to view details
+                  MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                      // Open detailed view for this todo item
+                      root.openTodoDetails(modelData);
+                    }
+                  }
+
                   RowLayout {
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -1300,6 +1309,20 @@ Item {
     }
   }
 
+  // Function to open the detailed view for a todo item
+  function openTodoDetails(todo) {
+    // Fill the detail dialog with the todo's information
+    detailDialog.todoId = todo.id;
+    detailDialog.todoText = todo.text;
+    detailDialog.todoCompleted = todo.completed;
+    detailDialog.todoCreatedAt = todo.createdAt;
+    detailDialog.todoPageId = todo.pageId;
+    detailDialog.todoPriority = todo.priority;
+
+    // Show the dialog
+    detailDialog.open();
+  }
+
   function loadTodos() {
     // Store the current scroll position
     var currentScrollPos = todoListView ? todoListView.contentY : 0;
@@ -1352,5 +1375,145 @@ Item {
 
     // Start the timer to delay checking if the model is empty
     emptyStateTimer.start();
+  }
+
+  // Dialog for displaying todo details
+  Popup {
+    id: detailDialog
+
+    property var todoId: 0
+    property string todoText: ""
+    property bool todoCompleted: false
+    property string todoCreatedAt: ""
+    property int todoPageId: 0
+    property string todoPriority: "medium"
+
+    x: (parent.width - width) / 2
+    y: (parent.height - height) / 2
+    width: 400 * Style.uiScaleRatio
+    height: 300 * Style.uiScaleRatio
+    modal: true
+    focus: true
+    padding: 0
+
+    // Close dialog on Escape key
+    Keys.onEscapePressed: {
+      detailDialog.close();
+    }
+
+    // Background rectangle
+    Rectangle {
+      anchors.fill: parent
+      color: Color.mSurface
+      radius: Style.radiusL
+      border.color: Color.mOutline
+      border.width: Style.borderS
+
+      // Content column
+      ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: Style.marginL
+        spacing: Style.marginM
+
+        // Header row
+        RowLayout {
+          Layout.fillWidth: true
+          spacing: Style.marginS
+
+          NText {
+            text: "Todo Details"
+            font.pointSize: Style.fontSizeL
+            font.weight: Font.Bold
+            color: Color.mOnSurface
+            Layout.fillWidth: true
+          }
+
+          // Close button
+          NIconButton {
+            icon: "x"
+            onClicked: detailDialog.close()
+          }
+        }
+
+        // Todo text
+        NText {
+          text: "Title: " + detailDialog.todoText
+          font.pointSize: Style.fontSizeM
+          color: Color.mOnSurface
+          wrapMode: Text.Wrap
+          Layout.fillWidth: true
+        }
+
+        // Status
+        RowLayout {
+          spacing: Style.marginS
+
+          NText {
+            text: "Status: "
+            font.pointSize: Style.fontSizeM
+            color: Color.mOnSurface
+          }
+
+          NText {
+            text: detailDialog.todoCompleted ? "Completed" : "Pending"
+            font.pointSize: Style.fontSizeM
+            color: detailDialog.todoCompleted ? Color.mPrimary : Color.mError
+            font.bold: true
+          }
+        }
+
+        // Created date
+        NText {
+          text: "Created: " + new Date(detailDialog.todoCreatedAt).toLocaleString()
+          font.pointSize: Style.fontSizeS
+          color: Color.mOnSurfaceVariant
+          Layout.fillWidth: true
+        }
+
+        // Priority
+        RowLayout {
+          spacing: Style.marginS
+
+          NText {
+            text: "Priority: "
+            font.pointSize: Style.fontSizeM
+            color: Color.mOnSurface
+          }
+
+          // Priority indicator
+          Rectangle {
+            width: 20
+            height: 20
+            radius: 10
+            color: root.getPriorityColor(detailDialog.todoPriority)
+          }
+
+          NText {
+            text: detailDialog.todoPriority.charAt(0).toUpperCase() + detailDialog.todoPriority.slice(1)
+            font.pointSize: Style.fontSizeM
+            color: Color.mOnSurface
+          }
+        }
+
+        // Page ID
+        NText {
+          text: "Page ID: " + detailDialog.todoPageId
+          font.pointSize: Style.fontSizeS
+          color: Color.mOnSurfaceVariant
+          Layout.fillWidth: true
+        }
+
+        // Action buttons
+        RowLayout {
+          Layout.alignment: Qt.AlignRight
+          spacing: Style.marginS
+
+          NButton {
+            text: "Close"
+            onClicked: detailDialog.close()
+          }
+        }
+      }
+    }
   }
 }
