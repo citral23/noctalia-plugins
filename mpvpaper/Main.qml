@@ -40,6 +40,10 @@ Item {
         setWallpaper(url);
     }
 
+    function clear() {
+        setWallpaper("");
+    }
+
     function setWallpaper(path) {
         if (root.pluginApi == null) {
             Logger.e("mpvpaper", "Can't set the wallpaper because pluginApi is null.");
@@ -50,8 +54,14 @@ Item {
         pluginApi.saveSettings();
     }
 
-    function clear() {
-        setWallpaper("");
+    function setActive(isActive) {
+        if(root.pluginApi == null) {
+            Logger.e("mpvpaper", "Can't change active state because pluginApi is null.");
+            return;
+        }
+
+        pluginApi.pluginSettings.active = isActive;
+        pluginApi.saveSettings();
     }
 
     onCurrentWallpaperChanged: {
@@ -70,7 +80,22 @@ Item {
                 mpvProc.running = true;
             }
         } else if(mpvProc.running) {
+            Logger.d("mpvpaper", "Current wallpaper is empty, turning mpvpaper off.");
+
             socket.connected = false;
+            mpvProc.running = false;
+        }
+    }
+
+    onActiveChanged: {
+        if(root.active && !mpvProc.running) {
+            Logger.d("mpvpaper", "Turning mpvpaper on.");
+
+            mpvProc.command = ["sh", "-c", `mpvpaper -o "input-ipc-server=${root.mpvSocket} loop no-audio" ALL ${root.currentWallpaper}` ]
+            mpvProc.running = true;
+        } else if(!root.active) {
+            Logger.d("mpvpaper", "Turning mpvpaper off.");
+
             mpvProc.running = false;
         }
     }
@@ -99,12 +124,28 @@ Item {
             root.random();
         }
 
+        function clear() {
+            root.clear();
+        }
+
         function setWallpaper(path: string) {
             root.setWallpaper(path);
         }
 
-        function clear() {
-            root.clear();
+        function getWallpaper(): string {
+            return root.currentWallpaper;
+        }
+
+        function setActive(isActive: bool) {
+            root.setActive(isActive);
+        }
+
+        function getActive(): bool {
+            return root.active;
+        }
+
+        function toggleActive() {
+            root.setActive(!root.active);
         }
     }
 }
