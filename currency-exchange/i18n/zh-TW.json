@@ -66,7 +66,7 @@
     "display_mode_description": "在元件中顯示多少資訊",
     "display_modes": {
       "compact": "精簡（匯率數字）",
-      "full": "完整（1 USD = 0.85 EUR）",
+      "full": "貨幣對",
       "icon": "僅圖示"
     },
     "general": "一般設定",

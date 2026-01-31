@@ -66,7 +66,7 @@
     "display_mode_description": "How much information to show in the widget",
     "display_modes": {
       "compact": "Compact (rate number)",
-      "full": "Full (1 USD = 0.85 EUR)",
+      "full": "Currency pair",
       "icon": "Icon only"
     },
     "general": "General Settings",

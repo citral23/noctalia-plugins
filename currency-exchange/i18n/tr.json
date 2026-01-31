@@ -66,7 +66,7 @@
     "display_mode_description": "Widget'ta ne kadar bilgi gösterileceği",
     "display_modes": {
       "compact": "Kompakt (kur numarası)",
-      "full": "Tam (1 USD = 0.85 EUR)",
+      "full": "Döviz çifti",
       "icon": "Yalnızca simge"
     },
     "general": "Genel Ayarlar",

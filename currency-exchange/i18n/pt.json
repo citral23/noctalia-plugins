@@ -66,7 +66,7 @@
     "display_mode_description": "Quanta informação mostrar no widget",
     "display_modes": {
       "compact": "Compacto (número da taxa)",
-      "full": "Completo (1 USD = 0.85 EUR)",
+      "full": "Par de moedas",
       "icon": "Apenas ícone"
     },
     "general": "Definições Gerais",

@@ -25,7 +25,7 @@ ColumnLayout {
     },
     {
       "key": "full",
-      "name": pluginApi?.tr("settings.display_modes.full") || "Full (1 USD = 0.85 EUR)"
+      "name": pluginApi?.tr("settings.display_modes.full") || "Currency pair"
     }
   ]
   property var pluginApi: null
@@ -99,28 +99,24 @@ ColumnLayout {
       Layout.fillWidth: true
       label: pluginApi?.tr("settings.general") || "General Settings"
     }
-
-    // TODO: change to searchable combo box
     NComboBox {
       Layout.fillWidth: true
       currentKey: valueSourceCurrency
       description: pluginApi?.tr("settings.source_currency_description") || "Default currency to convert from"
       label: pluginApi?.tr("settings.source_currency") || "Source Currency"
-      minimumWidth: 300
+      minimumWidth: 280
       model: currencyModel
 
       onSelected: key => {
         valueSourceCurrency = key;
       }
     }
-
-    // TODO: change to searchable combo box
     NComboBox {
       Layout.fillWidth: true
       currentKey: valueTargetCurrency
       description: pluginApi?.tr("settings.target_currency_description") || "Default currency to convert to"
       label: pluginApi?.tr("settings.target_currency") || "Target Currency"
-      minimumWidth: 300
+      minimumWidth: 280
       model: currencyModel
 
       onSelected: key => {
@@ -148,7 +144,7 @@ ColumnLayout {
       currentKey: valueWidgetDisplayMode
       description: pluginApi?.tr("settings.display_mode_description") || "How much information to show in the bar widget"
       label: pluginApi?.tr("settings.display_mode") || "Display Mode"
-      minimumWidth: 250
+      minimumWidth: 240
       model: displayModeModel
 
       onSelected: key => {
@@ -161,7 +157,7 @@ ColumnLayout {
       defaultValue: defaults.refreshInterval
       description: pluginApi?.tr("settings.refresh_interval_description") || "How often to refresh exchange rates automatically"
       label: pluginApi?.tr("settings.refresh_interval") || "Auto-refresh Interval"
-      minimumWidth: 250
+      minimumWidth: 240
       model: refreshIntervalModel
 
       onSelected: key => valueRefreshInterval = key

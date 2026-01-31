@@ -66,7 +66,7 @@
     "display_mode_description": "Quantité d'informations à afficher dans le widget",
     "display_modes": {
       "compact": "Compact (nombre du taux)",
-      "full": "Complet (1 USD = 0.85 EUR)",
+      "full": "Paire de devises",
       "icon": "Icône uniquement"
     },
     "general": "Paramètres Généraux",

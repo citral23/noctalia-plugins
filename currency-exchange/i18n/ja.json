@@ -66,7 +66,7 @@
     "display_mode_description": "ウィジェットに表示する情報量",
     "display_modes": {
       "compact": "コンパクト（レート数値）",
-      "full": "フル（1 USD = 0.85 EUR）",
+      "full": "通貨ペア",
       "icon": "アイコンのみ"
     },
     "general": "一般設定",
