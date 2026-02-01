@@ -41,6 +41,7 @@ ColumnLayout {
   property string editPanelPosition: pluginApi?.pluginSettings?.panelPosition || pluginApi?.manifest?.metadata?.panel?.defaultPosition || "right"
   property real editPanelHeightRatio: pluginApi?.pluginSettings?.panelHeightRatio || pluginApi?.manifest?.metadata?.panel?.defaultHeightRatio || 0.85
   property int editPanelWidth: pluginApi?.pluginSettings?.panelWidth ?? 520
+  property string editAttachmentStyle: pluginApi?.pluginSettings?.attachmentStyle || "connected"
   property real editScale: pluginApi?.pluginSettings?.scale || pluginApi?.manifest?.metadata?.defaultSettings?.scale || 1
 
   // Environment variable API keys - check if managed by env
@@ -69,6 +70,18 @@ ColumnLayout {
     checked: root.editPanelDetached
     onToggled: function (checked) {
       root.editPanelDetached = checked;
+      // Reset position if invalid for new mode
+      if (checked) {
+        // Switching to Detached: "top" and "bottom" become invalid -> default to "right"
+        if (root.editPanelPosition === "top" || root.editPanelPosition === "bottom") {
+          root.editPanelPosition = "right";
+        }
+      } else {
+        // Switching to Attached: "center" becomes invalid -> default to "right"
+        if (root.editPanelPosition === "center") {
+          root.editPanelPosition = "right";
+        }
+      }
     }
     defaultValue: true
   }
@@ -77,11 +90,7 @@ ColumnLayout {
     Layout.fillWidth: true
     label: pluginApi?.tr("settings.panelPosition") || "Panel Position"
     description: pluginApi?.tr("settings.panelPositionDesc") || "Default screen edge for the panel"
-    model: [
-      {
-        "key": "right",
-        "name": pluginApi?.tr("settings.panelPositionRight") || "Right"
-      },
+    model: root.editPanelDetached ? [
       {
         "key": "left",
         "name": pluginApi?.tr("settings.panelPositionLeft") || "Left"
@@ -89,6 +98,27 @@ ColumnLayout {
       {
         "key": "center",
         "name": pluginApi?.tr("settings.panelPositionCenter") || "Center"
+      },
+      {
+        "key": "right",
+        "name": pluginApi?.tr("settings.panelPositionRight") || "Right"
+      }
+    ] : [
+      {
+        "key": "left",
+        "name": pluginApi?.tr("settings.panelPositionLeft") || "Left"
+      },
+      {
+        "key": "top",
+        "name": pluginApi?.tr("settings.panelPositionTop") || "Top"
+      },
+      {
+        "key": "bottom",
+        "name": pluginApi?.tr("settings.panelPositionBottom") || "Bottom"
+      },
+      {
+        "key": "right",
+        "name": pluginApi?.tr("settings.panelPositionRight") || "Right"
       }
     ]
     currentKey: root.editPanelPosition
@@ -96,6 +126,28 @@ ColumnLayout {
       root.editPanelPosition = key;
     }
     defaultValue: "right"
+  }
+
+  NComboBox {
+    Layout.fillWidth: true
+    visible: !root.editPanelDetached
+    label: pluginApi?.tr("settings.attachmentStyle") || "Attachment Style"
+    description: pluginApi?.tr("settings.attachmentStyleDesc") || "How the panel attaches to the side"
+    model: [
+      {
+        "key": "connected",
+        "name": pluginApi?.tr("settings.attachConnected") || "Connected to Bar"
+      },
+      {
+        "key": "floating",
+        "name": pluginApi?.tr("settings.attachFloating") || "Floating (Drawer)"
+      }
+    ]
+    currentKey: root.editAttachmentStyle
+    onSelected: function (key) {
+      root.editAttachmentStyle = key;
+    }
+    defaultValue: "connected"
   }
 
   ColumnLayout {
@@ -476,6 +528,8 @@ ColumnLayout {
     pluginApi.pluginSettings.panelPosition = root.editPanelPosition;
     pluginApi.pluginSettings.panelHeightRatio = root.editPanelHeightRatio;
     pluginApi.pluginSettings.panelWidth = root.editPanelWidth;
+    pluginApi.pluginSettings.panelWidth = root.editPanelWidth;
+    pluginApi.pluginSettings.attachmentStyle = root.editAttachmentStyle;
     pluginApi.pluginSettings.scale = root.editScale;
 
     pluginApi.saveSettings();
