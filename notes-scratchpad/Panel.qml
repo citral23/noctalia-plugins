@@ -115,7 +115,7 @@ Item {
           icon: "x"
           onClicked: {
             if (pluginApi) {
-              pluginApi.closePanel(root.screen)
+              pluginApi.closePanel(pluginApi.panelOpenScreen)
             }
           }
         }
