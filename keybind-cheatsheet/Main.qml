@@ -11,14 +11,12 @@ Item {
 
 
   Component.onCompleted: {
-    logInfo("Main.qml Component.onCompleted");
     if (pluginApi && !parserStarted) {
       checkAndParse();
     }
   }
 
   onPluginApiChanged: {
-    logInfo("pluginApi changed");
     if (pluginApi && !parserStarted) {
       checkAndParse();
     }
@@ -30,19 +28,13 @@ Item {
     var savedCompositor = pluginApi?.pluginSettings?.detectedCompositor || "";
     var hasData = (pluginApi?.pluginSettings?.cheatsheetData || []).length > 0;
 
-    logInfo("Current compositor: " + currentCompositor + ", Saved: " + savedCompositor + ", HasData: " + hasData);
-
     // Re-parse if:
     // 1. No data cached yet, OR
     // 2. Compositor changed since last parse
     if (!hasData || currentCompositor !== savedCompositor) {
-      if (currentCompositor !== savedCompositor && savedCompositor !== "") {
-        logInfo("Compositor changed from " + savedCompositor + " to " + currentCompositor + " - re-parsing config");
-      }
       parserStarted = true;
       runParser();
     } else {
-      logInfo("Using cached data for " + currentCompositor);
       parserStarted = true; // Mark as done, using cache
     }
   }
@@ -81,32 +73,10 @@ Item {
     return messages[compositor] || messages["unknown"];
   }
 
-  // Logger helper functions
-  function logDebug(msg) {
-    if (typeof Logger !== 'undefined') Logger.d("KeybindCheatsheet", msg);
-    else console.log("[KeybindCheatsheet] " + msg);
-  }
-
-  function logInfo(msg) {
-    if (typeof Logger !== 'undefined') Logger.i("KeybindCheatsheet", msg);
-    else console.log("[KeybindCheatsheet] " + msg);
-  }
-
-  function logWarn(msg) {
-    if (typeof Logger !== 'undefined') Logger.w("KeybindCheatsheet", msg);
-    else console.warn("[KeybindCheatsheet] " + msg);
-  }
-
-  function logError(msg) {
-    if (typeof Logger !== 'undefined') Logger.e("KeybindCheatsheet", msg);
-    else console.error("[KeybindCheatsheet] " + msg);
-  }
-
   property bool parserStarted: false
 
   // Memory leak prevention: cleanup on destruction
   Component.onDestruction: {
-    logInfo("Cleaning up Main.qml resources");
     clearParsingData();
     cleanupProcesses();
   }
@@ -134,9 +104,7 @@ Item {
 
   // Refresh function - accessible from mainInstance
   function refresh() {
-    logInfo("Refresh called - will re-parse");
     if (!pluginApi) {
-      logError("Cannot refresh: pluginApi is null");
       return;
     }
 
@@ -163,7 +131,6 @@ Item {
 
   function runParser() {
     if (isCurrentlyParsing) {
-      logWarn("Parser already running, ignoring request");
       return;
     }
 
@@ -172,12 +139,7 @@ Item {
 
     // Detect compositor using CompositorService
     var compositorName = getCurrentCompositor();
-    if (CompositorService.isHyprland) {
-      logInfo("=== START PARSER for Hyprland ===");
-    } else if (CompositorService.isNiri) {
-      logInfo("=== START PARSER for Niri ===");
-    } else {
-      logError("Unsupported compositor: " + compositorName);
+    if (!CompositorService.isHyprland && !CompositorService.isNiri) {
       isCurrentlyParsing = false;
 
       var unsupportedMsg = getUnsupportedCompositorMessage(compositorName);
@@ -193,7 +155,6 @@ Item {
 
     var homeDir = Quickshell.env("HOME");
     if (!homeDir) {
-      logError("Cannot get $HOME");
       isCurrentlyParsing = false;
       saveToDb([{
         "title": "ERROR",
@@ -217,7 +178,6 @@ Item {
       filePath = filePath.replace(/^~/, homeDir);
     }
 
-    logInfo("Starting with main config: " + filePath);
     filesToParse = [filePath];
 
     if (CompositorService.isHyprland) {
@@ -246,7 +206,6 @@ Item {
   // ========== NIRI RECURSIVE PARSING ==========
   function parseNextNiriFile() {
     if (parseDepthCounter >= maxParseDepth) {
-      logError("Max parse depth reached (" + maxParseDepth + "), stopping recursion");
       isCurrentlyParsing = false;
       clearParsingData();
       return;
@@ -254,7 +213,6 @@ Item {
     parseDepthCounter++;
 
     if (filesToParse.length === 0) {
-      logInfo("All Niri files parsed, converting " + Object.keys(collectedBinds).length + " categories");
       finalizeNiriBinds();
       return;
     }
@@ -275,8 +233,6 @@ Item {
     }
 
     parsedFiles[nextFile] = true;
-    logInfo("Parsing Niri file: " + nextFile);
-
     currentLines = [];
     niriReadProcess.currentFilePath = nextFile;
     niriReadProcess.command = ["cat", nextFile];
@@ -294,8 +250,6 @@ Item {
         if (trimmed.length > 0) {
           if (niriGlobProcess.expandedFiles.length < 100) {
             niriGlobProcess.expandedFiles.push(trimmed);
-          } else {
-            root.logWarn("Max glob expansion limit reached (100 files)");
           }
         }
       }
@@ -322,14 +276,11 @@ Item {
       onRead: data => {
         if (root.currentLines.length < 10000) {
           root.currentLines.push(data);
-        } else {
-          root.logError("Config file too large (>10000 lines)");
         }
       }
     }
 
     onExited: (exitCode, exitStatus) => {
-      logInfo("niriReadProcess exited, code: " + exitCode + ", lines: " + root.currentLines.length);
       if (exitCode === 0 && root.currentLines.length > 0) {
         // First pass: find includes
         for (var i = 0; i < root.currentLines.length; i++) {
@@ -338,7 +289,6 @@ Item {
           if (includeMatch) {
             var includePath = includeMatch[1];
             var resolvedPath = root.resolveRelativePath(currentFilePath, includePath);
-            logInfo("Found include: " + includePath + " -> " + resolvedPath);
             if (!root.parsedFiles[resolvedPath] && root.filesToParse.indexOf(resolvedPath) === -1) {
               root.filesToParse.push(resolvedPath);
             }
@@ -353,7 +303,6 @@ Item {
   }
 
   function parseNiriFileContent(text) {
-    logInfo("parseNiriFileContent called, text length: " + text.length);
     var lines = text.split('\n');
     var inBindsBlock = false;
     var bindsBlockDepth = 0;
@@ -402,7 +351,6 @@ Item {
       if (!inBindsBlock && line.startsWith("binds") && line.includes("{")) {
         inBindsBlock = true;
         bindsBlockDepth = 1;
-        logInfo("Entered binds block");
         continue;
       }
 
@@ -417,7 +365,6 @@ Item {
         var categoryMatch = line.match(/\/\/\s*#?"([^"]+)"/);
         if (categoryMatch) {
           currentCategory = categoryMatch[1];
-          logDebug("Found category: " + currentCategory);
         }
         continue;
       }
@@ -453,7 +400,6 @@ Item {
           // Not a bind start, track braces for binds block
           bindsBlockDepth += openBraces - closeBraces;
           if (bindsBlockDepth <= 0) {
-            logInfo("Exiting binds block, found " + bindsFoundInFile + " binds");
             inBindsBlock = false;
           }
         }
@@ -494,16 +440,12 @@ Item {
         "desc": description
       });
 
-      logDebug("Added bind: " + formattedKeys + " -> " + description + " [" + category + "]");
-
       // Reset state
       currentBindKey = null;
       currentBindAttributes = "";
       currentBindAction = "";
       bindBraceDepth = 0;
     }
-
-    logInfo("File parsing done, bindsFoundInFile: " + bindsFoundInFile);
   }
 
   function finalizeNiriBinds() {
@@ -529,7 +471,6 @@ Item {
       }
     }
 
-    logInfo("Found " + categories.length + " categories total");
     saveToDb(categories);
     isCurrentlyParsing = false;
     clearParsingData();
@@ -538,7 +479,6 @@ Item {
   // ========== HYPRLAND RECURSIVE PARSING ==========
   function parseNextHyprlandFile() {
     if (parseDepthCounter >= maxParseDepth) {
-      logError("Max parse depth reached (" + maxParseDepth + "), stopping recursion");
       isCurrentlyParsing = false;
       clearParsingData();
       return;
@@ -546,11 +486,9 @@ Item {
     parseDepthCounter++;
 
     if (filesToParse.length === 0) {
-      logInfo("All Hyprland files parsed, total lines: " + accumulatedLines.length);
       if (accumulatedLines.length > 0) {
         parseHyprlandConfig(accumulatedLines.join("\n"));
       } else {
-        logWarn("No content found in config files");
         isCurrentlyParsing = false;
       }
       return;
@@ -572,8 +510,6 @@ Item {
     }
 
     parsedFiles[nextFile] = true;
-    logInfo("Parsing Hyprland file: " + nextFile);
-
     currentLines = [];
     hyprReadProcess.currentFilePath = nextFile;
     hyprReadProcess.command = ["cat", nextFile];
@@ -591,8 +527,6 @@ Item {
         if (trimmed.length > 0) {
           if (hyprGlobProcess.expandedFiles.length < 100) {
             hyprGlobProcess.expandedFiles.push(trimmed);
-          } else {
-            root.logWarn("Max glob expansion limit reached (100 files)");
           }
         }
       }
@@ -619,8 +553,6 @@ Item {
       onRead: data => {
         if (root.currentLines.length < 10000) {
           root.currentLines.push(data);
-        } else {
-          root.logError("Config file too large (>10000 lines)");
         }
       }
     }
@@ -638,7 +570,6 @@ Item {
             var commentIdx = sourcePath.indexOf('#');
             if (commentIdx > 0) sourcePath = sourcePath.substring(0, commentIdx).trim();
             var resolvedPath = root.resolveRelativePath(currentFilePath, sourcePath);
-            logInfo("Found source: " + sourcePath + " -> " + resolvedPath);
             if (!root.parsedFiles[resolvedPath] && root.filesToParse.indexOf(resolvedPath) === -1) {
               root.filesToParse.push(resolvedPath);
             }
@@ -652,7 +583,6 @@ Item {
 
   // ========== HYPRLAND PARSER ==========
   function parseHyprlandConfig(text) {
-    logDebug("Parsing Hyprland config");
     var lines = text.split('\n');
     var categories = [];
     var currentCategory = null;
@@ -670,7 +600,6 @@ Item {
           categories.push(currentCategory);
         }
         var title = line.replace(/#\s*\d+\.\s*/, "").trim();
-        logDebug("New category: " + title);
         currentCategory = { "title": title, "binds": [] };
       }
       // Keybind: bind = $mod, T, exec, cmd #"description"
@@ -706,7 +635,6 @@ Item {
               "keys": fullKey,
               "desc": description
             });
-            logDebug("Added bind: " + fullKey);
           }
         }
       }
@@ -716,7 +644,6 @@ Item {
       categories.push(currentCategory);
     }
 
-    logDebug("Found " + categories.length + " categories");
     saveToDb(categories);
     isCurrentlyParsing = false;
     clearParsingData();
@@ -724,7 +651,6 @@ Item {
 
   // ========== NIRI PARSER ==========
   function parseNiriConfig(text) {
-    logDebug("Parsing Niri KDL config");
     var lines = text.split('\n');
     var inBindsBlock = false;
     var braceDepth = 0;
@@ -805,8 +731,6 @@ Item {
           "keys": formattedKeys,
           "desc": formatNiriAction(action)
         });
-
-        logDebug("Added bind: " + formattedKeys + " -> " + action);
       }
     }
 
@@ -839,7 +763,6 @@ Item {
       }
     }
 
-    logDebug("Found " + categories.length + " categories");
     saveToDb(categories);
   }
 
@@ -961,9 +884,6 @@ Item {
       pluginApi.pluginSettings.cheatsheetData = data;
       pluginApi.pluginSettings.detectedCompositor = compositor;
       pluginApi.saveSettings();
-      logInfo("Saved " + data.length + " categories for " + compositor + " to settings");
-    } else {
-      logError("pluginApi is null!");
     }
   }
 
