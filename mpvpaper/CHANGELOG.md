@@ -2,6 +2,13 @@
 
 Here I'll try to document all changes for the mpvpaper plugin.
 
+## 1.6.0 - 2026-02-06
+
+- feat: Added the ability to set the mpv profile, there is a fast profile for better optimization.
+- feat: Added the ability to enable hardware acceleration for less cpu usage.
+- fix: Fixed so that the thumbnails don't regenerate every time the shell is restarted.
+- fix: Reformatted a lot of the code to make the code more readable.
+
 ## 1.5.0 - 2026-02-04
 
 - feat: Added the ability to control the volume of the video wallpaper, both with IPC and from the settings.

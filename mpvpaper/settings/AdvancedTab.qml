@@ -12,36 +12,79 @@ ColumnLayout {
     required property var pluginApi
     required property bool active
     
+    property bool hardwareAcceleration:
+        pluginApi?.pluginSettings?.hardwareAcceleration ||
+        false
+
     property string mpvSocket: 
         pluginApi?.pluginSettings?.mpvSocket ||
         pluginApi?.manifest?.metadata?.defaultSettings?.mpvSocket ||
         "/tmp/mpv-socket"
 
+    property string profile:
+        pluginApi?.pluginSettings?.profile ||
+        pluginApi?.manifest?.metadata?.defaultSettings?.profile ||
+        "default"
+
+
+    // Profile
+    NComboBox {
+        enabled: root.active
+        Layout.fillWidth: true
+        label: pluginApi?.tr("settings.profile.label") || "Profile"
+        description: pluginApi?.tr("settings.profile.description") || "The profile that mpv uses. Use fast for better performance.";
+        defaultValue: "default"
+        model: [
+            {
+                "key": "default",
+                "name": pluginApi?.tr("settings.profile.default") || "Default"
+            },
+            {
+                "key": "fast",
+                "name": pluginApi?.tr("settings.profile.fast") || "Fast"
+            },
+            {
+                "key": "high-quality",
+                "name": pluginApi?.tr("settings.profile.high_quality") || "High Quality"
+            },
+            {
+                "key": "low-latency",
+                "name": pluginApi?.tr("settings.profile.low_latency") || "Low Latency"
+            }
+        ]
+        currentKey: root.profile
+        onSelected: key => root.profile = key
+    }
+
+    // Hardware Acceleration
+    NToggle {
+        enabled: root.active
+        Layout.fillWidth: true
+        label: pluginApi?.tr("settings.hardware_acceleration.label") || "Hardware Acceleration"
+        description: pluginApi?.tr("settings.hardware_acceleration.description") || "Offloads video decoding from cpu to gpu / dedicated hardware.";
+        checked: root.hardwareAcceleration
+        onToggled: checked => root.hardwareAcceleration = checked
+        defaultValue: false
+    }
 
     // MPV Socket path
-    ColumnLayout {
-        spacing: Style.marginS
-
-        NLabel {
-            enabled: root.active
-            label: pluginApi?.tr("settings.mpv_socket.title_label") || "Mpvpaper socket"
-            description: pluginApi?.tr("settings.mpv_socket.title_description") || "The mpvpaper socket that noctalia connects to"
-        }
-
-        NTextInput {
-            enabled: root.active
-            Layout.fillWidth: true
-            placeholderText: pluginApi?.tr("settings.mpv_socket.input_placeholder") || "Example: /tmp/mpv-socket"
-            text: root.mpvSocket
-            onTextChanged: root.mpvSocket = text
-        }
+    NTextInput {
+        enabled: root.active
+        Layout.fillWidth: true
+        label: pluginApi?.tr("settings.mpv_socket.title_label") || "Mpvpaper socket"
+        description: pluginApi?.tr("settings.mpv_socket.title_description") || "The mpvpaper socket that noctalia connects to"
+        placeholderText: pluginApi?.tr("settings.mpv_socket.input_placeholder") || "Example: /tmp/mpv-socket"
+        text: root.mpvSocket
+        onTextChanged: root.mpvSocket = text
     }
 
     Connections {
         target: pluginApi
         function onPluginSettingsChanged() {
             // Update the local properties on change
+            root.hardwareAcceleration = root.pluginApi.pluginSettings.hardwareAcceleration || false
             root.mpvSocket = root.pluginApi.pluginSettings.mpvSocket || "/tmp/mpv-socket";
+            root.profile = root.pluginApi.pluginSettings.profile || pluginApi?.manifest?.metadata?.defaultSettings?.profile || "default"
         }
     }
 
@@ -55,6 +98,8 @@ ColumnLayout {
             return;
         }
 
+        pluginApi.pluginSettings.hardwareAcceleration = hardwareAcceleration;
         pluginApi.pluginSettings.mpvSocket = mpvSocket;
+        pluginApi.pluginSettings.profile = profile;
     }
 }

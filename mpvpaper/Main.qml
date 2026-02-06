@@ -20,6 +20,10 @@ Item {
         pluginApi.pluginSettings.currentWallpaper || 
         ""
 
+    readonly property bool hardwareAcceleration:
+        pluginApi.pluginSettings.hardwareAcceleration ||
+        false
+
     readonly property bool isMuted:
         pluginApi.pluginSettings.isMuted ||
         false
@@ -36,6 +40,11 @@ Item {
     readonly property var oldWallpapers:
         pluginApi.pluginSettings.oldWallpapers || 
         ({})
+
+    readonly property string profile:
+        pluginApi.pluginSettings.profile ||
+        pluginApi.manifest.metadata.defaultSettings.profile ||
+        "default"
 
     readonly property bool thumbCacheReady:
         pluginApi.pluginSettings.thumbCacheReady ||
@@ -81,85 +90,6 @@ Item {
         pluginApi.saveSettings();
     }
 
-    function setActive(isActive) {
-        if(root.pluginApi == null) {
-            Logger.e("mpvpaper", "Can't change active state because pluginApi is null.");
-            return;
-        }
-
-        pluginApi.pluginSettings.active = isActive;
-        pluginApi.saveSettings();
-    }
-
-
-    /***************************
-    * PLAYBACK FUNCTIONALITY
-    ***************************/
-    function resume() {
-        if (pluginApi == null) return;
-
-        pluginApi.pluginSettings.isPlaying = true;
-        pluginApi.saveSettings();
-    }
-
-    function pause() {
-        if (pluginApi == null) return;
-
-        pluginApi.pluginSettings.isPlaying = false;
-        pluginApi.saveSettings();
-    }
-
-    function togglePlaying() {
-        if (pluginApi == null) return;
-
-        pluginApi.pluginSettings.isPlaying = !root.isPlaying;
-        pluginApi.saveSettings();
-    }
-
-
-    /***************************
-    * AUDIO FUNCTIONALITY
-    ***************************/
-    function mute() {
-        if (pluginApi == null) return;
-
-        pluginApi.pluginSettings.isMuted = true;
-        pluginApi.saveSettings();
-    }
-
-    function unmute() {
-        if (pluginApi == null) return;
-
-        pluginApi.pluginSettings.isMuted = false;
-        pluginApi.saveSettings();
-    }
-
-    function toggleMute() {
-        if (pluginApi == null) return;
-
-        pluginApi.pluginSettings.isMuted = !root.isMuted;
-        pluginApi.saveSettings();
-    }
-
-    function setVolume(volume) {
-        if (pluginApi == null) return;
-
-        pluginApi.pluginSettings.volume = volume;
-        pluginApi.saveSettings();
-    }
-
-    function increaseVolume() {
-        if (pluginApi == null) return;
-
-        setVolume(root.volume + Settings.data.audio.volumeStep);
-    }
-
-    function decreaseVolume() {
-        if (pluginApi == null) return;
-
-        setVolume(root.volume - Settings.data.audio.volumeStep);
-    }
-
     /***************************
     * HELPER FUNCTIONALITY
     ***************************/
@@ -186,9 +116,11 @@ Item {
 
         active: root.active
         currentWallpaper: root.currentWallpaper
+        hardwareAcceleration: root.hardwareAcceleration
         isMuted: root.isMuted
         isPlaying: root.isPlaying
         mpvSocket: root.mpvSocket
+        profile: root.profile
         volume: root.volume
 
         thumbnails: thumbnails
@@ -244,6 +176,7 @@ Item {
             root.clear();
         }
 
+        // Current wallpaper
         function setWallpaper(path: string) {
             root.setWallpaper(path);
         }
@@ -252,8 +185,12 @@ Item {
             return root.currentWallpaper;
         }
 
+        // Active
         function setActive(isActive: bool) {
-            root.setActive(isActive);
+            if (root.pluginApi == null) return;
+
+            root.pluginApi.pluginSettings.active = isActive;
+            root.pluginApi.saveSettings();
         }
 
         function getActive(): bool {
@@ -261,43 +198,79 @@ Item {
         }
 
         function toggleActive() {
-            root.setActive(!root.active);
+            setActive(!root.active);
         }
 
+        // Is playing
         function resume() {
-            root.resume();
+            if (root.pluginApi == null) return;
+
+            root.pluginApi.pluginSettings.isPlaying = true;
+            root.pluginApi.saveSettings();
         }
 
         function pause() {
-            root.pause();
+            if (root.pluginApi == null) return;
+
+            root.pluginApi.pluginSettings.isPlaying = false;
+            root.pluginApi.saveSettings();
         }
 
         function togglePlaying() {
-            root.togglePlaying();
+            if (root.pluginApi == null) return;
+
+            root.pluginApi.pluginSettings.isPlaying = !root.isPlaying;
+            root.pluginApi.saveSettings();
         }
 
+        // Mute / unmute
         function mute() {
-            root.mute();
+            if (root.pluginApi == null) return;
+
+            root.pluginApi.pluginSettings.isMuted = true;
+            root.pluginApi.saveSettings();
         }
 
         function unmute() {
-            root.unmute();
+            if (root.pluginApi == null) return;
+
+            root.pluginApi.pluginSettings.isMuted = false;
+            root.pluginApi.saveSettings();
         }
 
         function toggleMute() {
-            root.toggleMute();
+            if (root.pluginApi == null) return;
+
+            root.pluginApi.pluginSettings.isMuted = !root.isMuted;
+            root.pluginApi.saveSettings();
         }
 
+        // Volume
         function setVolume(volume: real) {
-            root.setVolume(volume);
+            if (root.pluginApi == null) return;
+
+            root.pluginApi.pluginSettings.volume = volume;
+            root.pluginApi.saveSettings();
         }
 
         function increaseVolume() {
-            root.increaseVolume();
+            setVolume(root.volume + Settings.data.audio.volumeStep);
         }
 
         function decreaseVolume() {
-            root.decreaseVolume();
+            setVolume(root.volume - Settings.data.audio.volumeStep);
+        }
+
+        // Hardware acceleration
+        function setHardwareAcceleration(active: bool) {
+            if (root.pluginApi == null) return;
+
+            root.pluginApi.pluginSettings.hardwareAcceleration = active;
+            root.pluginApi.saveSettings();
+        }
+
+        function toggleHardwareAcceleration() {
+            setHardwareAcceleration(!root.hardwareAcceleration);
         }
     }
 }

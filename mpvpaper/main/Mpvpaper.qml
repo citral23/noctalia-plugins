@@ -15,9 +15,11 @@ Item {
     ***************************/
     required property bool active 
     required property string currentWallpaper 
+    required property bool hardwareAcceleration
     required property bool isPlaying
     required property bool isMuted
     required property string mpvSocket
+    required property string profile
     required property real volume
 
     required property Thumbnails thumbnails
@@ -33,7 +35,7 @@ Item {
         // Save the old wallpapers of the user.
         innerService.saveOldWallpapers();
 
-        mpvProc.command = ["sh", "-c", `mpvpaper -o "input-ipc-server=${root.mpvSocket} loop ${isMuted ? "no-audio" : ""}" ALL ${root.currentWallpaper}` ]
+        mpvProc.command = ["sh", "-c", `mpvpaper -o "input-ipc-server=${root.mpvSocket} profile='${profile}' ${hardwareAcceleration ? "hwdec=auto" : ""} loop ${isMuted ? "no-audio" : ""}" ALL ${root.currentWallpaper}` ]
         mpvProc.running = true;
 
         pluginApi.pluginSettings.isPlaying = true;
@@ -100,6 +102,18 @@ Item {
         }
     }
 
+    onHardwareAccelerationChanged: {
+        Logger.d("mpvpaper", "Changing hardware acceleration");
+
+        if(!root.active || !mpvProc.running) return;
+
+        if(hardwareAcceleration) {
+            sendCommandToMPV("set hwdec auto");
+        } else {
+            sendCommandToMPV("set hwdec no");
+        }
+    }
+
     onIsMutedChanged: {
         if (!mpvProc.running) {
             Logger.d("mpvpaper", "No wallpaper is running!");
@@ -126,6 +140,14 @@ Item {
         } else {
             sendCommandToMPV("set pause yes");
         }
+    }
+
+    onProfileChanged: {
+        Logger.d("mpvpaper", "Changing current profile");
+
+        if (!root.active || !mpvProc.running) return;
+
+        sendCommandToMPV(`set profile ${profile}`)
     }
 
     onVolumeChanged: {
