@@ -123,11 +123,6 @@ Item {
         return thumbnails.getThumbPath(videoPath);
     }
 
-    // Get thumbnail url based on video name
-    function getThumbUrl(videoPath: string): string {
-        return thumbnails.getThumbUrl(videoPath);
-    }
-
     function thumbRegenerate() {
         thumbnails.thumbRegenerate();
     }

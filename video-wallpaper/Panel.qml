@@ -168,7 +168,7 @@ Item {
                                 borderWidth: root.thumbCacheReady && root.currentWallpaper == wallpapersFolderModel.get(index, "filePath") ? Style.borderM : 0
                                 borderColor: Color.mPrimary;
 
-                                imagePath: root.thumbCacheReady && root.pluginApi.mainInstance != null ? root.pluginApi.mainInstance.getThumbUrl(wallpaper.path) : "";
+                                imagePath: root.thumbCacheReady && root.pluginApi.mainInstance != null ? root.pluginApi.mainInstance.getThumbPath(wallpaper.path) : "";
                                 fallbackIcon: "alert-circle"
 
                                 MouseArea {

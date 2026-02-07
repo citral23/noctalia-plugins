@@ -2,6 +2,10 @@
 
 Here I'll try to document all changes for the video-wallpaper plugin.
 
+## 1.1.1 - 2026-02-07
+
+- fix: Fixed some bugs with the color generation and the thumbnail generation.
+
 ## 1.1.0 - 2026-02-07
 
 - feat: Added control of the fill mode.
