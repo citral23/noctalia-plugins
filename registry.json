@@ -602,6 +602,24 @@
       "lastUpdated": "2026-02-05T21:01:51-05:00"
     },
     {
+      "id": "video-wallpaper",
+      "name": "Video Wallpaper",
+      "version": "1.0.0",
+      "official": false,
+      "author": "Spyridon Siarapis",
+      "description": "A plugin that uses QtMultimedia to play videos as your wallpaper.",
+      "repository": "https://github.com/noctalia-dev/noctalia-plugins",
+      "minNoctaliaVersion": "3.6.0",
+      "license": "MIT",
+      "tags": [
+        "Bar",
+        "Panel",
+        "Fun",
+        "System"
+      ],
+      "lastUpdated": "2026-02-06T23:52:50+01:00"
+    },
+    {
       "id": "weather-indicator",
       "name": "Weather Indicator",
       "version": "1.0.5",
