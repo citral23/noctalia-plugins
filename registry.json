@@ -297,7 +297,7 @@
     {
       "id": "mpvpaper",
       "name": "Mpvpaper",
-      "version": "1.6.0",
+      "version": "1.6.1",
       "official": false,
       "author": "Spyridon Siarapis",
       "description": "A plugin that allows having video wallpapers using mpvpaper.",
@@ -310,7 +310,7 @@
         "Fun",
         "System"
       ],
-      "lastUpdated": "2026-02-06T12:34:07+01:00"
+      "lastUpdated": "2026-02-07T21:25:56+11:00"
     },
     {
       "id": "network-indicator",
