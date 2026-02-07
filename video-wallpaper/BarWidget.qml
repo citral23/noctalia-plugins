@@ -37,8 +37,10 @@ Item {
                 "icon": "rectangle"
             },
             {
-                "label": root.pluginApi?.tr("barWidget.contextMenu.toggle") || "Toggle",
-                "action": "toggle",
+                "label": root.enabled ?
+                    root.pluginApi?.tr("barWidget.contextMenu.disable") || "Disable" :
+                    root.pluginApi?.tr("barWidget.contextMenu.enable") || "Enable",
+                "action": root.enabled ? "disable" : "enable",
                 "icon": "power"
             },
             {
@@ -70,8 +72,12 @@ Item {
                 case "panel":
                     root.pluginApi?.openPanel(root.screen, root);
                     break;
-                case "toggle":
-                    root.pluginApi.pluginSettings.enabled = !root.enabled;
+                case "enable":
+                    root.pluginApi.pluginSettings.enabled = true;
+                    root.pluginApi.saveSettings();
+                    break;
+                case "disable":
+                    root.pluginApi.pluginSettings.enabled = false;
                     root.pluginApi.saveSettings();
                     break;
                 case "play":
