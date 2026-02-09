@@ -1273,21 +1273,89 @@ Item {
                 Layout.alignment: Qt.AlignTop
               }
 
+              // Priority selector with H/M/L buttons
               RowLayout {
                 spacing: Style.marginXS
 
+                // High priority button
                 Rectangle {
-                  width: 12
-                  height: 12
-                  radius: 6
-                  color: root.getPriorityColor(detailDialog.todoPriority)
+                  width: 28
+                  height: 28
+                  radius: 4
+                  color: detailDialog.todoPriority === "high" ? getPriorityColor("high") : Qt.rgba(getPriorityColor("high").r, getPriorityColor("high").g, getPriorityColor("high").b, 0.2)
+                  border.color: detailDialog.todoPriority === "high" ? getPriorityColor("high") : "transparent"
+                  border.width: 2
+
+                  NText {
+                    anchors.centerIn: parent
+                    text: "H"
+                    color: detailDialog.todoPriority === "high" ? Color.mOnPrimary : getPriorityColor("high")
+                    font.pointSize: Style.fontSizeS
+                    font.weight: Font.Bold
+                  }
+
+                  MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                      updateTodo(detailDialog.todoId, { priority: "high" });
+                      detailDialog.todoPriority = "high";
+                    }
+                  }
                 }
 
-                NText {
-                  text: detailDialog.todoPriority.charAt(0).toUpperCase() + detailDialog.todoPriority.slice(1)
-                  font.pointSize: Style.fontSizeS
-                  font.weight: Font.Medium
-                  color: Color.mOnSurface
+                // Medium priority button
+                Rectangle {
+                  width: 28
+                  height: 28
+                  radius: 4
+                  color: detailDialog.todoPriority === "medium" ? getPriorityColor("medium") : Qt.rgba(getPriorityColor("medium").r, getPriorityColor("medium").g, getPriorityColor("medium").b, 0.2)
+                  border.color: detailDialog.todoPriority === "medium" ? getPriorityColor("medium") : "transparent"
+                  border.width: 2
+
+                  NText {
+                    anchors.centerIn: parent
+                    text: "M"
+                    color: detailDialog.todoPriority === "medium" ? Color.mOnPrimary : getPriorityColor("medium")
+                    font.pointSize: Style.fontSizeS
+                    font.weight: Font.Bold
+                  }
+
+                  MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                      updateTodo(detailDialog.todoId, { priority: "medium" });
+                      detailDialog.todoPriority = "medium";
+                    }
+                  }
+                }
+
+                // Low priority button
+                Rectangle {
+                  width: 28
+                  height: 28
+                  radius: 4
+                  color: detailDialog.todoPriority === "low" ? getPriorityColor("low") : Qt.rgba(getPriorityColor("low").r, getPriorityColor("low").g, getPriorityColor("low").b, 0.2)
+                  border.color: detailDialog.todoPriority === "low" ? getPriorityColor("low") : "transparent"
+                  border.width: 2
+
+                  NText {
+                    anchors.centerIn: parent
+                    text: "L"
+                    color: detailDialog.todoPriority === "low" ? Color.mOnPrimary : getPriorityColor("low")
+                    font.pointSize: Style.fontSizeS
+                    font.weight: Font.Bold
+                  }
+
+                  MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                      updateTodo(detailDialog.todoId, { priority: "low" });
+                      detailDialog.todoPriority = "low";
+                    }
+                  }
                 }
               }
             }
