@@ -13,9 +13,9 @@ Item {
     /***************************
     * PROPERTIES
     ***************************/
-    readonly property string    currentWallpaper:   pluginApi.pluginSettings.currentWallpaper   || ""
-    readonly property bool      enabled:            pluginApi.pluginSettings.enabled            || false
-    readonly property var       oldWallpapers:      pluginApi.pluginSettings.oldWallpapers      || ({})
+    readonly property string currentWallpaper: pluginApi?.pluginSettings?.currentWallpaper || ""
+    readonly property bool   enabled:          pluginApi?.pluginSettings?.enabled          || false
+    readonly property var    oldWallpapers:    pluginApi?.pluginSettings?.oldWallpapers    || ({})
 
     required property var getThumbPath
     required property FolderModel thumbFolderModel

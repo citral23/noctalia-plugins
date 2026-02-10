@@ -16,14 +16,12 @@ ColumnLayout {
     required property var pluginApi
     required property bool enabled
 
-    readonly property bool isMuted:     pluginApi.pluginSettings.isMuted    || false
-    readonly property bool isPlaying:   pluginApi.pluginSettings.isPlaying  || false
+    readonly property bool  isMuted:   pluginApi?.pluginSettings?.isMuted   || false
+    readonly property bool  isPlaying: pluginApi?.pluginSettings?.isPlaying || false
 
-    property string currentWallpaper:   pluginApi.pluginSettings.currentWallpaper   || ""
-    property int    fillMode:           pluginApi.pluginSettings.fillMode           || 0
-    property int    orientation:        pluginApi.pluginSettings.orientation        || 0
-    property double volume:             pluginApi.pluginSettings.volume             || 1.0
-    property string wallpapersFolder:   pluginApi.pluginSettings.wallpapersFolder   || "~/Pictures/Wallpapers"
+    property string currentWallpaper:   pluginApi?.pluginSettings?.currentWallpaper   || ""
+    property double volume:             pluginApi?.pluginSettings?.volume             || pluginApi?.manifest?.metadata?.defaultSettings?.volume           || 0
+    property string wallpapersFolder:   pluginApi?.pluginSettings?.wallpapersFolder   || pluginApi?.manifest?.metadata?.defaultSettings?.wallpapersFolder || ""
 
 
     /***************************
@@ -107,60 +105,6 @@ ColumnLayout {
 
     NDivider {}
 
-    // Fill Mode
-    NComboBox {
-        enabled: root.enabled
-        Layout.fillWidth: true
-        label: root.pluginApi?.tr("settings.general.fill_mode.label") || "Fill Mode"
-        description: root.pluginApi?.tr("settings.general.fill_mode.description") || "The mode that the wallpaper is fitted into the background."
-        defaultValue: "0"
-        model: [
-            {
-                "key": "0",
-                "name": root.pluginApi?.tr("settings.general.fill_mode.stretch") || "Stretch"
-            },
-            {
-                "key": "1",
-                "name": root.pluginApi?.tr("settings.general.fill_mode.fit") || "Fit"
-            },
-            {
-                "key": "2",
-                "name": root.pluginApi?.tr("settings.general.fill_mode.crop") || "Crop"
-            }
-        ]
-        currentKey: root.fillMode
-        onSelected: key => root.fillMode = key
-    }
-
-    // Orientation
-    NValueSlider {
-        property real _value: root.orientation
-
-        enabled: root.enabled
-        from: -270
-        to: 270
-        value: root.orientation
-        defaultValue: 0
-        stepSize: 90
-        text: _value
-        label: root.pluginApi?.tr("settings.general.orientation.label") || "Orientation"
-        description: root.pluginApi?.tr("settings.general.orientation.description") || "The orientation of the video playing, can be any multiple of 90."
-        onMoved: value => _value = value
-        onPressedChanged: (pressed, value) => {
-            if(root.pluginApi == null) {
-                Logger.e("video-wallpaper", "Plugin API is null.");
-                return
-            }
-
-            if(!pressed) {
-                root.pluginApi.pluginSettings.orientation = value;
-                root.pluginApi.saveSettings();
-            }
-        }
-    }
-
-    NDivider {}
-
     // Volume
     NValueSlider {
         property real _value: root.volume
@@ -193,11 +137,9 @@ ColumnLayout {
         target: pluginApi
         function onPluginSettingsChanged() {
             // Update the local properties on change
-            currentWallpaper =  pluginApi.pluginSettings.currentWallpaper   || ""
-            fillMode =          pluginApi.pluginSettings.fillMode           || 0
-            orientation =       pluginApi.pluginSettings.orientation        || 0
-            volume =            pluginApi.pluginSettings.volume             || 1.0
-            wallpapersFolder =  pluginApi.pluginSettings.wallpapersFolder   || "~/Pictures/Wallpapers"
+            root.currentWallpaper = root.pluginApi?.pluginSettings?.currentWallpaper   || ""
+            root.volume =           root.pluginApi?.pluginSettings?.volume             || root.pluginApi?.manifest?.metadata?.defaultSettings?.volume           || 0
+            root.wallpapersFolder = root.pluginApi?.pluginSettings?.wallpapersFolder   || root.pluginApi?.manifest?.metadata?.defaultSettings?.wallpapersFolder || ""
         }
     }
 
@@ -205,14 +147,12 @@ ColumnLayout {
     * Save settings functionality
     ********************************/
     function saveSettings() {
-        if(!pluginApi) {
+        if(pluginApi == null) {
             Logger.e("video-wallpaper", "Cannot save, pluginApi is null");
             return;
         }
 
         pluginApi.pluginSettings.currentWallpaper = currentWallpaper;
-        pluginApi.pluginSettings.fillMode = fillMode;
-        pluginApi.pluginSettings.orientation = orientation;
         pluginApi.pluginSettings.volume = volume;
         pluginApi.pluginSettings.wallpapersFolder = wallpapersFolder;
     }

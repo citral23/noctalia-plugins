@@ -1,10 +1,10 @@
 # Video Wallpaper
 
-A plugin that allows having video wallpapers using QtMultimedia.
+A plugin that uses a backend renderer to play videos as your wallpaper.
 
 ## Requirements
 
-- qt6-multimedia, for playing the videos
+- To render the video wallpaper you can use either mpvpaper or qt6-multimedia.
 - ffmpeg, for creating thumbnails of the wallpapers
 
 ## Credits

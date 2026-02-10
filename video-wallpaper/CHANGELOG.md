@@ -2,15 +2,23 @@
 
 Here I'll try to document all changes for the video-wallpaper plugin.
 
+## 1.2.0 - 2026-02-09
+
+- feat: Added support to use mpvpaper as a backend renderer.
+- feat: Added advanced settings page for more advanced settings, more specified to the renderer.
+- feat: Added the ability to have custom times for automatic wallpaper updates.
+- fix: Fixed thumbnails with weird names not being supported.
+- fix: Fixed warnings that might appear in the logs because of wrongly created variables.
+
 ## 1.1.3 - 2026-02-08
 
-- feat: Added IPC call to open the panel
+- feat: Added IPC call to open the panel.
 - fix: Rewrote a lot of the backend code to make it more stable.
 - fix: Fixed a lot of bugs.
 
 ## 1.1.2 - 2026-02-07
 
-- i18n: added german translations
+- i18n: Added german translations.
 
 ## 1.1.1 - 2026-02-07
 

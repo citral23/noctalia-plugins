@@ -24,10 +24,11 @@ Item {
     /***************************
     * PROPERTIES
     ***************************/
-    readonly property string    currentWallpaper:   pluginApi.pluginSettings.currentWallpaper   || ""
-    readonly property bool      enabled:            pluginApi.pluginSettings.enabled            || false
-    readonly property bool      thumbCacheReady:    pluginApi.pluginSettings.thumbCacheReady    || false
-    readonly property string    wallpapersFolder:   pluginApi.pluginSettings.wallpapersFolder   || "~/Pictures/Wallpapers"
+    readonly property string activeBackend:    pluginApi?.pluginSettings?.activeBackend    || pluginApi?.manifest?.metadata?.defaultSettings?.activeBackend    || ""
+    readonly property string currentWallpaper: pluginApi?.pluginSettings?.currentWallpaper || ""
+    readonly property bool   enabled:          pluginApi?.pluginSettings?.enabled          || false
+    readonly property bool   thumbCacheReady:  pluginApi?.pluginSettings?.thumbCacheReady  || false
+    readonly property string wallpapersFolder: pluginApi?.pluginSettings?.wallpapersFolder || pluginApi?.manifest?.metadata?.defaultSettings.wallpapersFolder || ""
 
 
     /***************************
@@ -60,7 +61,7 @@ Item {
                 spacing: Style.marginM
 
                 NText {
-                    text: pluginApi?.tr("panel.title") || "Video wallpaper manager"
+                    text: root.pluginApi?.tr("panel.title") || "Video wallpaper manager"
                     pointSize: Style.fontSizeXL
                     font.weight: Font.Bold
                     Layout.fillWidth: true
@@ -91,7 +92,7 @@ Item {
                     tooltipText: root.pluginApi?.tr("panel.tool_row.refresh.tooltip") || "Refresh thumbnails, remove old ones and create new ones."
 
                     onClicked: { 
-                        if(pluginApi.mainInstance == null) {
+                        if(root.pluginApi.mainInstance == null) {
                             Logger.e("video-wallpaper", "Main instance is null, so can't call thumbRegenerate");
                         }
                         root.pluginApi.mainInstance.thumbRegenerate();
@@ -104,9 +105,18 @@ Item {
                     checked: root.enabled
                     onToggled: checked => {
                         if(root.pluginApi == null) return;
+
                         root.pluginApi.pluginSettings.enabled = checked;
                         root.pluginApi.saveSettings();
                     }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                NLabel {
+                    label: `Using: ${root.activeBackend}`
                 }
             }
 

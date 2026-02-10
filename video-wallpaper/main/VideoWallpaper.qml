@@ -18,13 +18,13 @@ Variants {
     /***************************
     * PROPERTIES
     ***************************/
-    readonly property string    currentWallpaper:   pluginApi.pluginSettings.currentWallpaper   || ""
-    readonly property bool      enabled:            pluginApi.pluginSettings.enabled            || false
-    readonly property int       fillMode:           pluginApi.pluginSettings.fillMode           || 0
-    readonly property bool      isMuted:            pluginApi.pluginSettings.isMuted            || false
-    readonly property bool      isPlaying:          pluginApi.pluginSettings.isPlaying          || false
-    readonly property int       orientation:        pluginApi.pluginSettings.orientation        || 0
-    readonly property double    volume:             pluginApi.pluginSettings.volume             || 1.0
+    readonly property string currentWallpaper: pluginApi?.pluginSettings?.currentWallpaper || ""
+    readonly property bool   enabled:          pluginApi?.pluginSettings?.enabled          || false
+    readonly property string fillMode:         pluginApi?.pluginSettings?.fillMode         || pluginApi?.manifest?.metadata?.defaultSettings?.fillMode || ""
+    readonly property bool   isMuted:          pluginApi?.pluginSettings?.isMuted          || false
+    readonly property bool   isPlaying:        pluginApi?.pluginSettings?.isPlaying        || false
+    readonly property int    orientation:      pluginApi?.pluginSettings?.orientation      || 0
+    readonly property double volume:           pluginApi?.pluginSettings?.volume           || pluginApi?.manifest?.metadata?.defaultSettings?.volume || 0
 
 
     /***************************
@@ -82,9 +82,12 @@ Variants {
                 anchors.fill: parent
                 autoPlay: true
                 fillMode: {
-                    if(root.fillMode == 1) return VideoOutput.PreserveAspectFit
-                    else if (root.fillMode == 2) return VideoOutput.PreserveAspectCrop
-                    else return VideoOutput.Stretch
+                    if      (root.fillMode == "fit")     return VideoOutput.PreserveAspectFit;
+                    else if (root.fillMode == "crop")    return VideoOutput.PreserveAspectCrop;
+                    else if (root.fillMode == "stretch") return VideoOutput.Stretch;
+                    else {
+                        Logger.e("video-wallpaper", "Unsupported fill mode detected:", root.fillMode);
+                    }
                 }
                 loops: MediaPlayer.Infinite
                 muted: root.isMuted
@@ -95,9 +98,10 @@ Variants {
                     else return 0.00000001
                 }
                 source: {
-                    if(root.currentWallpaper == "") return ""
+                    // Make sure to use the correct format
+                    if      (root.currentWallpaper == "")                 return ""
                     else if (root.currentWallpaper.startsWith("file://")) return root.currentWallpaper
-                    else return `file://${root.currentWallpaper}`
+                    else                                                  return `file://${root.currentWallpaper}`
                 }
                 volume: root.volume
 

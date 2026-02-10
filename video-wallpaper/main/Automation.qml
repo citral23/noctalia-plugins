@@ -13,9 +13,9 @@ Item {
     /***************************
     * PROPERTIES
     ***************************/
-    readonly property bool      automation:         pluginApi.pluginSettings.automation         || false
-    readonly property string    automationMode:     pluginApi.pluginSettings.automationMode     || "random"
-    readonly property real      automationTime:     pluginApi.pluginSettings.automationTime     || 5 * 60
+    readonly property bool   automation:     pluginApi?.pluginSettings?.automation     || false
+    readonly property string automationMode: pluginApi?.pluginSettings?.automationMode || pluginApi?.manifest?.metadata?.defaultSettings?.automationMode || ""
+    readonly property real   automationTime: pluginApi?.pluginSettings?.automationTime || pluginApi?.manifest?.metadata?.defaultSettings?.automationTime || 0
     
     required property var random
     required property var nextWallpaper
@@ -48,7 +48,7 @@ Item {
     ***************************/
     Timer {
         id: timer
-        interval: automationTime * 1000
+        interval: root.automationTime * 1000
         repeat: true
 
         onTriggered: {

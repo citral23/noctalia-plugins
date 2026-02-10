@@ -14,8 +14,9 @@ Item {
     /***************************
     * PROPERTIES
     ***************************/
-    readonly property string currentWallpaper: pluginApi.pluginSettings.currentWallpaper || ""
-    readonly property string wallpapersFolder: pluginApi.pluginSettings.wallpapersFolder || "~/Pictures/Wallpapers"
+    readonly property string activeBackend:    pluginApi?.pluginSettings?.activeBackend    || pluginApi?.manifest?.metadata?.defaultSettings?.activeBackend    || ""
+    readonly property string currentWallpaper: pluginApi?.pluginSettings?.currentWallpaper || ""
+    readonly property string wallpapersFolder: pluginApi?.pluginSettings?.wallpapersFolder || pluginApi?.manifest?.metadata?.defaultSettings?.wallpapersFolder || ""
 
     readonly property string thumbCacheFolderPath: ImageCacheService.wpThumbDir + "video-wallpaper"
 
@@ -85,13 +86,51 @@ Item {
         thumbnails.thumbRegenerate();
     }
 
+    /***************************
+    * EVENTS
+    ***************************/
+    onActiveBackendChanged: {
+        // Unload old backend and reload the new backend
+        wallpaperLoader.active = false;
+        Qt.callLater(() => {
+            wallpaperLoader.active = true;
+        });
+    }
 
     /***************************
     * COMPONENTS
     ***************************/
-    VideoWallpaper {
-        id: wallpaper
-        pluginApi: root.pluginApi
+    Loader {
+        id: wallpaperLoader
+        active: true
+        asynchronous: true
+        
+        sourceComponent: {
+            switch (root.activeBackend) {
+                case "mpvpaper":
+                    return mpvpaper;
+                case "qt6-multimedia":
+                    return qtmultimedia;
+                default:
+                    Logger.e("video-wallpaper", "No active backend.");
+            }
+        }
+    }
+
+    Component {
+        id: qtmultimedia
+
+        VideoWallpaper {
+            pluginApi: root.pluginApi
+        }
+    }
+
+    Component {
+        id: mpvpaper
+
+        Mpvpaper {
+            pluginApi: root.pluginApi
+        }
     }
 
     Thumbnails {
@@ -142,5 +181,9 @@ Item {
     IPC {
         id: ipcHandler
         pluginApi: root.pluginApi
+
+        random: root.random
+        clear: root.clear
+        setWallpaper: root.setWallpaper
     }
 }

@@ -19,9 +19,9 @@ Item {
     /***************************
     * PROPERTIES
     ***************************/
-    readonly property bool enabled:     pluginApi.pluginSettings.enabled    || false
-    readonly property bool isPlaying:   pluginApi.pluginSettings.isPlaying  || false
-    readonly property bool isMuted:     pluginApi.pluginSettings.isMuted    || false
+    readonly property bool enabled:   pluginApi?.pluginSettings?.enabled   || false
+    readonly property bool isPlaying: pluginApi?.pluginSettings?.isPlaying || false
+    readonly property bool isMuted:   pluginApi?.pluginSettings?.isMuted   || false
 
 
     /***************************
@@ -97,7 +97,7 @@ Item {
                     root.pluginApi.saveSettings();
                     break;
                     case "settings":
-                    BarService.openPluginSettings(root.screen, pluginApi.manifest);
+                    BarService.openPluginSettings(root.screen, root.pluginApi.manifest);
                     break;
                 default:
                     Logger.e("video-wallpaper", "Error, action not found:", action);
@@ -114,11 +114,11 @@ Item {
         icon: "wallpaper-selector"
 
         onClicked: {
-            pluginApi?.openPanel(root.screen, root);
+            root.pluginApi?.openPanel(root.screen, root);
         }
 
         onRightClicked: {
-            PanelService.showContextMenu(contextMenu, root, screen);
+            PanelService.showContextMenu(contextMenu, root, root.screen);
         }
     }
 }
