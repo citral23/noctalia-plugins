@@ -297,7 +297,7 @@
     {
       "id": "mpvpaper",
       "name": "Mpvpaper",
-      "version": "1.6.1",
+      "version": "1.6.2",
       "official": false,
       "author": "Spyridon Siarapis",
       "description": "A plugin that allows having video wallpapers using mpvpaper.",
@@ -310,7 +310,7 @@
         "Fun",
         "System"
       ],
-      "lastUpdated": "2026-02-07T21:25:56+11:00"
+      "lastUpdated": "2026-02-09T20:15:29+01:00"
     },
     {
       "id": "network-indicator",
@@ -604,7 +604,7 @@
     {
       "id": "video-wallpaper",
       "name": "Video Wallpaper",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "official": false,
       "author": "Spyridon Siarapis",
       "description": "A plugin that uses a backend renderer to play videos as your wallpaper.",
@@ -617,7 +617,7 @@
         "Fun",
         "System"
       ],
-      "lastUpdated": "2026-02-09T20:55:44+01:00"
+      "lastUpdated": "2026-02-10T17:29:24+01:00"
     },
     {
       "id": "weather-indicator",
