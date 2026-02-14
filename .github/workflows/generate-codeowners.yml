@@ -1,0 +1,42 @@
+name: Generate CODEOWNERS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  generate-codeowners:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate CODEOWNERS
+        run: bash .github/workflows/generate-codeowners.sh
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet CODEOWNERS 2>/dev/null; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes to CODEOWNERS"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected in CODEOWNERS"
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add CODEOWNERS
+          git commit -m "chore: update CODEOWNERS [skip ci]"
+          git push
